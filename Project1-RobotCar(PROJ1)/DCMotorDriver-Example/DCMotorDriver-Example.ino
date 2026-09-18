@@ -14,6 +14,9 @@
 #define ENA 10   // Motor A speed control (PWM)
 #define ENB 5    // Motor B speed control (PWM)
 
+const int motorSpeed = 140;
+const int motorSpeed2 = 150;
+
 void setup() {
   // Set all motor control pins as outputs
   pinMode(IN1, OUTPUT);
@@ -28,6 +31,8 @@ void setup() {
   digitalWrite(IN2, LOW);
   digitalWrite(IN3, LOW);
   digitalWrite(IN4, LOW);
+
+  delay(2000);
 }
 
 void loop() {
@@ -36,25 +41,9 @@ void loop() {
   digitalWrite(IN2, LOW);
   digitalWrite(IN3, HIGH);
   digitalWrite(IN4, LOW);
-  analogWrite(ENA, 128);   // Motor A at ~50% speed
-  analogWrite(ENB, 128);   // Motor B at ~50% speed
-  delay(2000);
-
-  // --- STOP both motors ---
-  digitalWrite(IN1, LOW);
-  digitalWrite(IN2, LOW);
-  digitalWrite(IN3, LOW);
-  digitalWrite(IN4, LOW);
-  delay(2000);
-
-  // --- Move both motors BACKWARD at half speed ---
-  digitalWrite(IN1, LOW);
-  digitalWrite(IN2, HIGH);
-  digitalWrite(IN3, LOW);
-  digitalWrite(IN4, HIGH);
-  analogWrite(ENA, 128);
-  analogWrite(ENB, 128);
-  delay(2000);
+  analogWrite(ENA, motorSpeed2);   // Motor A at ~50% speed
+  analogWrite(ENB, motorSpeed);   // Motor B at ~50% speed
+  delay(2500);
 
   // --- STOP both motors ---
   digitalWrite(IN1, LOW);
@@ -62,4 +51,37 @@ void loop() {
   digitalWrite(IN3, LOW);
   digitalWrite(IN4, LOW);
   delay(1000);
+
+  // --- Move both motors BACKWARD at half speed ---
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, HIGH);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, HIGH);
+  analogWrite(ENA, motorSpeed2);
+  analogWrite(ENB, motorSpeed);
+  delay(2500);
+
+  // --- STOP both motors ---
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, LOW);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, LOW);
+  delay(1000);
+
+  // digitalWrite(IN1, HIGH);
+  // digitalWrite(IN2, LOW);
+  // digitalWrite(IN3, LOW);
+  // digitalWrite(IN4, HIGH);
+  // analogWrite(ENA, motorSpeed);   // Motor A at ~50% speed
+  // analogWrite(ENB, motorSpeed);   // Motor B at ~50% speed
+  // delay(1000);
+
+  // digitalWrite(IN1, LOW);
+  // digitalWrite(IN2, HIGH);
+  // digitalWrite(IN3, HIGH);
+  // digitalWrite(IN4, LOW);
+  // analogWrite(ENA, motorSpeed);   // Motor A at ~50% speed
+  // analogWrite(ENB, motorSpeed);   // Motor B at ~50% speed
+  // delay(1000);
+
 }

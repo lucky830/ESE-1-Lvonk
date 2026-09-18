@@ -12,9 +12,9 @@ int LEDPinArrayReverse[] = { 13, 12, 11, 10, 9, 8 };  // All pins of the leds in
 int LEDcount = (sizeof(LEDPinArray) / sizeof(LEDPinArray[0]));
 
 int direction = 0;
-const int buttonPin = 0;
+const int buttonPin = 3;
 int state = 1;
-const int stateButtonPin = 1;
+const int stateButtonPin = 4;
 int stateButtonPinState = 0;
 int lastStateButtonPinState = 0;
 
