@@ -14,8 +14,9 @@
 #define ENA 10   // Motor A speed control (PWM)
 #define ENB 5    // Motor B speed control (PWM)
 
-const int motorSpeed = 140;
-const int motorSpeed2 = 150;
+// Als de motor te ver naar links gaat, moet motorSpeed omhoog, als hij te ver naar rechts gaat moet motorSpeed omlaag
+const int motorSpeed = 250.5;//195; // Links
+const int motorSpeed2 = 255;//140; // Rechts
 
 void setup() {
   // Set all motor control pins as outputs
@@ -43,7 +44,7 @@ void loop() {
   digitalWrite(IN4, LOW);
   analogWrite(ENA, motorSpeed2);   // Motor A at ~50% speed
   analogWrite(ENB, motorSpeed);   // Motor B at ~50% speed
-  delay(2500);
+  delay(10000);
 
   // --- STOP both motors ---
   digitalWrite(IN1, LOW);
@@ -59,7 +60,7 @@ void loop() {
   digitalWrite(IN4, HIGH);
   analogWrite(ENA, motorSpeed2);
   analogWrite(ENB, motorSpeed);
-  delay(2500);
+  delay(10000);
 
   // --- STOP both motors ---
   digitalWrite(IN1, LOW);
@@ -74,7 +75,7 @@ void loop() {
   // digitalWrite(IN4, HIGH);
   // analogWrite(ENA, motorSpeed);   // Motor A at ~50% speed
   // analogWrite(ENB, motorSpeed);   // Motor B at ~50% speed
-  // delay(1000);
+  // delay(2000);
 
   // digitalWrite(IN1, LOW);
   // digitalWrite(IN2, HIGH);
@@ -82,6 +83,6 @@ void loop() {
   // digitalWrite(IN4, LOW);
   // analogWrite(ENA, motorSpeed);   // Motor A at ~50% speed
   // analogWrite(ENB, motorSpeed);   // Motor B at ~50% speed
-  // delay(1000);
+  // delay(2000);
 
 }
