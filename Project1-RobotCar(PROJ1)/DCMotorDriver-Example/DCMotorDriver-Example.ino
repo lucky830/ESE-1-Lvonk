@@ -17,7 +17,7 @@
 // Als de motor te ver naar links gaat, moet motorSpeed omhoog, als hij te ver naar rechts gaat moet motorSpeed omlaag
 const int motorSpeed = 250.5;//195; // Links
 const int motorSpeed2 = 255;//140; // Rechts
-
+// 
 void setup() {
   // Set all motor control pins as outputs
   pinMode(IN1, OUTPUT);
