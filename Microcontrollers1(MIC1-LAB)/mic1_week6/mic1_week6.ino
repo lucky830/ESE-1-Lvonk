@@ -1,93 +1,175 @@
 /*
   MIC1 Week 6. Sensors and Actuators 2
 
-  Author <Student name>
-         <Student number>
-  Date   dd/mm/yyyy
+  Author Lucas Vonk
+         2189041
+  Date   10/10/2026
 */
-// Include the EEPROM library
-#include <EEPROM.h>
 
-// Previous values
+#include <EEPROM.h>
+#include <LiquidCrystal_I2C.h>
+#include <chip_temperature.h>
+
+
+LiquidCrystal_I2C lcd(0x27, 16, 2);
+
 unsigned long previousMillis = 0;
 int previousButtonState = 0;
 
-// The pin connected to the pushbutton
-const int buttonPin = 21;
+const int buttonPin = 2;
 
-// EEPROM data
-const int N_DATA = 4;
-const int data[N_DATA] = { 0, 1, 2, -1 };
+int hours = 0;
+int minutes = 0;
+int seconds = 0;
 
-// Interval at which to display the EEPROM contents (milliseconds)
+const int N_DATA = 3;
+int data[N_DATA] = { 0, 1, 23 };
+
+const int markerAddress = N_DATA * sizeof(int);
+const byte savedMarker = 123;
+
 unsigned long interval = 1000;
+
+bool alarmActive = false;
+bool previousAlarmMatch = false;
+bool backlightOn = true;
+unsigned long alarmStartMillis = 0;
+unsigned long previousBlinkMillis = 0;
 
 void setup() {
   Serial.begin(9600);
 
-  // Initialize the button pin as an input
-  pinMode(buttonPin, INPUT);
+  pinMode(buttonPin, INPUT_PULLUP);
 
-  // Read the button pin startup value
   previousButtonState = digitalRead(buttonPin);
+
+  for (unsigned int i = 0; i < N_DATA; i++) {
+    unsigned int address = i * sizeof(int);
+    EEPROM.get(address, data[i]);
+  }
+
+  if (EEPROM.read(markerAddress) != savedMarker ||
+      data[0] < 0 || data[0] > 23 ||
+      data[1] < 0 || data[1] > 59 ||
+      data[2] < 0 || data[2] > 59) {
+    data[0] = 0;
+    data[1] = 1;
+    data[2] = 23;
+    saveAlarm();
+  }
+
+  lcd.init();
+  lcd.backlight();
+  showTime();
+  showAlarm();
+
+  previousMillis = millis();
 }
 
 void loop() {
 
-  // --------------------------------------------------------------------------
-
-  // Check to see if it's time for the next reading
   unsigned long currentMillis = millis();
 
-  if (currentMillis - previousMillis >= interval) {
-    // Save the current time so it can be used to calculate if the has passed
-    previousMillis = currentMillis;
+  while (currentMillis - previousMillis >= interval) {
+    previousMillis += interval;
 
-    for (unsigned int i = 0; i < N_DATA; i++) {
-      // The size of an int is two bytes. Use the sizeof() preprocessor
-      // operator instead.
-      unsigned int address = i * sizeof(int);
-      int value = 0;
-
-      EEPROM.get(address, value);
-
-      Serial.print(value);
-      Serial.print(" ");
+    seconds++;
+    if (seconds >= 60) {
+      seconds = 0;
+      minutes++;
     }
-    Serial.println();
+    if (minutes >= 60) {
+      minutes = 0;
+      hours++;
+    }
+    if (hours >= 24) {
+      hours = 0;
+    }
+
+    showTime();
   }
 
-  // --------------------------------------------------------------------------
-
-  // Read the pushbutton input pin
   int buttonState = digitalRead(buttonPin);
 
-  // Compare the buttonState to its previous state
   if (buttonState != previousButtonState) {
-    // State has changed, so save the new state
-    previousButtonState = buttonState;
+    delay(30);
+    buttonState = digitalRead(buttonPin);
 
-    // Check the button value. If the value is LOW the button was pressed
-    if (buttonState == LOW) {
+    if (buttonState != previousButtonState) {
+      previousButtonState = buttonState;
 
-      Serial.println("Switch press detected: writing EEPROM");
 
-      for (unsigned int i = 0; i < N_DATA; i++) {
-        // The size of an int is two bytes. Use the sizeof() preprocessor
-        // define instead.
-        unsigned int address = i * sizeof(int);
-        int value = data[i];
+      if (buttonState == LOW) {
+        data[0] = hours;
+        data[1] = minutes;
+        data[2] = seconds;
 
-        EEPROM.put(address, value);
-
-        Serial.print(value);
-        Serial.print(" ");
+        saveAlarm();
+        showAlarm();
+        Serial.println("Switch press detected: alarm saved in EEPROM");
       }
-      Serial.println();
     }
-
-    // Delay a little bit to avoid bouncing
-    // Only required if there is no hardware debouncing
-    // delay(30);
   }
+
+  bool alarmMatch = hours == data[0] &&
+                    minutes == data[1] &&
+                    seconds == data[2];
+
+  if (alarmMatch && !previousAlarmMatch) {
+    alarmActive = true;
+    alarmStartMillis = currentMillis;
+    previousBlinkMillis = currentMillis;
+    backlightOn = true;
+    lcd.backlight();
+  }
+  previousAlarmMatch = alarmMatch;
+
+  if (alarmActive) {
+    if (currentMillis - alarmStartMillis >= 10000) {
+      alarmActive = false;
+      backlightOn = true;
+      lcd.backlight();
+    } else if (currentMillis - previousBlinkMillis >= 250) {
+      previousBlinkMillis += 250;
+      backlightOn = !backlightOn;
+      if (backlightOn) {
+        lcd.backlight();
+      } else {
+        lcd.noBacklight();
+      }
+    }
+  }
+}
+
+void saveAlarm() {
+  for (unsigned int i = 0; i < N_DATA; i++) {
+    unsigned int address = i * sizeof(int);
+    EEPROM.put(address, data[i]);
+  }
+  EEPROM.update(markerAddress, savedMarker);
+}
+
+void showTime() {
+  char timeText[9];
+  snprintf(timeText, sizeof(timeText), "%02d:%02d:%02d",
+           hours, minutes, seconds);
+
+  lcd.setCursor(0, 0);
+  lcd.print(timeText);
+  Serial.println(timeText);
+
+  int temperature = chip_temperature_read();
+  char temperatureText[7];
+  snprintf(temperatureText, sizeof(temperatureText), "%4d%cC",
+           temperature, 0xDF);
+  lcd.setCursor(10, 0);
+  lcd.print(temperatureText);
+}
+
+void showAlarm() {
+  char alarmText[9];
+  snprintf(alarmText, sizeof(alarmText), "%02d:%02d:%02d",
+           data[0], data[1], data[2]);
+  lcd.setCursor(0, 1);
+  lcd.print(alarmText);
 }

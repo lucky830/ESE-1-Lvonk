@@ -1,0 +1,10 @@
+views:
+  - type: table
+    name: Table
+    filters:
+      and:
+        - file.folder == "Programming-1/C language"
+        - file.fullname != "All C files.base"
+    imageFit: contain
+    image: file.file
+    rowHeight: medium

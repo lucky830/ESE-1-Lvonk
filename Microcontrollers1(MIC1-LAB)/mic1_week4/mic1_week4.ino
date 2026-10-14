@@ -1,20 +1,21 @@
 /*
   MIC1 Week 4. Analog
 
-  Author <Student name>
-         <Student number>
-  Date   dd/mm/yyyy
+  Author Lucas Vonk
+         2189041
+  Date   14/10/2026
 */
+#include <Arduino.h>
 
 // Previous values
 unsigned long previousMillis = 0;
 int previousButtonState = 0;
 
 // Interval at which to chase (milliseconds)
-unsigned long interval = 100;
+unsigned long interval = 200;
 
 // The pin connected to the pushbutton
-const int buttonPin = 21;
+const int buttonPin = 2;
 
 // The pin connected to the photoresistor
 int photoresistorPin = A0;
@@ -28,11 +29,22 @@ String inputString = "";
 // A flag that indicates if the string is complete
 bool stringComplete = false;
 
+
+int previousPhotoresistorValue = 0;
+
 void setup() {
   Serial.begin(9600);
 
   // Initialize the button pin as an input
-  pinMode(buttonPin, INPUT);
+  pinMode(buttonPin, INPUT_PULLUP);
+
+  pinMode(8, OUTPUT);
+  pinMode(9, OUTPUT);
+  pinMode(10, OUTPUT);
+  pinMode(11, OUTPUT);
+  pinMode(12, OUTPUT);
+  pinMode(13, OUTPUT);
+
 
   // Read the button pin startup value
   previousButtonState = digitalRead(buttonPin);
@@ -48,11 +60,23 @@ void loop() {
   if (currentMillis - previousMillis >= interval) {
     // Save the current time so it can be used to calculate if the has passed
     previousMillis = currentMillis;
-
     photoresistorValue = analogRead(photoresistorPin);
 
-    Serial.print("Photoresistor value: ");
-    Serial.println(photoresistorValue);
+    if (abs(photoresistorValue - previousPhotoresistorValue) > 10) {
+      Serial.print("Photoresistor value: ");
+      Serial.println(photoresistorValue);
+    }
+
+    if (photoresistorValue < 300) {
+      digitalWrite(10, LOW);
+    } else if (photoresistorValue >= 500) {
+      digitalWrite(10, HIGH);
+    }
+    
+
+    // Serial.print("Photoresistor value: ");
+    // Serial.println(photoresistorValue);
+    previousPhotoresistorValue = photoresistorValue;
   }
 
   // --------------------------------------------------------------------------
@@ -67,7 +91,8 @@ void loop() {
 
     // Check the button value. If the value is LOW the button was pressed
     if (buttonState == LOW) {
-      Serial.println("SW0 pressed");
+      // Serial.println("SW0 pressed");
+      digitalWrite(8, !digitalRead(8));
     }
 
     // Delay a little bit to avoid bouncing
@@ -80,9 +105,18 @@ void loop() {
     // Clear the flag
     stringComplete = false;
 
-    if (inputString == "5\n") {
-      Serial.println("50%");
-    }
+    // Convert number that is in the string to an integer
+    int valueNr = inputString.toInt();
+    int ledVal = map(valueNr, 0, 9, 0, 255);
+
+    analogWrite(9, ledVal);
+    Serial.println(ledVal);
+
+
+    // if (inputString == "5\n") {
+    //   Serial.println("50%");
+    // }
+
 
     // Clear the string:
     inputString = "";
