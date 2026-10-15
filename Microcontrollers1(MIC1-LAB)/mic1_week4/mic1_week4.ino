@@ -15,7 +15,7 @@ int previousButtonState = 0;
 unsigned long interval = 200;
 
 // The pin connected to the pushbutton
-const int buttonPin = 2;
+const int buttonPin = 21;
 
 // The pin connected to the photoresistor
 int photoresistorPin = A0;
@@ -92,7 +92,8 @@ void loop() {
     // Check the button value. If the value is LOW the button was pressed
     if (buttonState == LOW) {
       // Serial.println("SW0 pressed");
-      digitalWrite(8, !digitalRead(8));
+      digitalWrite(8, !1
+      digitalRead(8));
     }
 
     // Delay a little bit to avoid bouncing

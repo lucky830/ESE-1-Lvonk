@@ -1,9 +1,9 @@
 /*
   MIC1 Week 5. Sensors and Actuators 1
 
-  Author <Student name>
-         <Student number>
-  Date   dd/mm/yyyy
+  Author Lucas Vonk
+         2189041
+  Date   14/10/2026
 */
 
 // LCD: SDA to A4, SCL to A5
@@ -12,7 +12,7 @@ LiquidCrystal_I2C lcd(0x27, 16, 2);
 
 const int trigPin = 6;
 const int echoPin = 7;
-const int buttonPin = 2;  // Button between D2 and GND
+const int buttonPin = 21;  // Button between D2 and GND
 
 unsigned long previousMillis = 0;
 unsigned long interval = 100;
@@ -23,10 +23,12 @@ int distance_max = 0;
 bool distanceValid = false;
 
 void setup() {
+  Serial.begin(9600);
   pinMode(echoPin, INPUT);
   pinMode(trigPin, OUTPUT);
   digitalWrite(trigPin, LOW);
-  pinMode(buttonPin, INPUT_PULLUP);
+  // pinMode(buttonPin, INPUT_PULLUP);
+  pinMode(buttonPin, INPUT);
   previousButtonState = digitalRead(buttonPin);
 
   lcd.init();
@@ -59,6 +61,7 @@ void loop() {
       if (distance_cm > distance_max) {
         distance_max = distance_cm;
       }
+      Serial.println("distance_cm");
       showBar();
     }
   }

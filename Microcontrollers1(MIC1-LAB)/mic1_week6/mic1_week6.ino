@@ -16,7 +16,7 @@ LiquidCrystal_I2C lcd(0x27, 16, 2);
 unsigned long previousMillis = 0;
 int previousButtonState = 0;
 
-const int buttonPin = 2;
+const int buttonPin = 21;
 
 int hours = 0;
 int minutes = 0;
