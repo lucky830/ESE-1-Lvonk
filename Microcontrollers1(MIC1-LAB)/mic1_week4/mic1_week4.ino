@@ -92,8 +92,7 @@ void loop() {
     // Check the button value. If the value is LOW the button was pressed
     if (buttonState == LOW) {
       // Serial.println("SW0 pressed");
-      digitalWrite(8, !1
-      digitalRead(8));
+      digitalWrite(8, !digitalRead(8));
     }
 
     // Delay a little bit to avoid bouncing

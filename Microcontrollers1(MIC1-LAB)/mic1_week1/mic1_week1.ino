@@ -2,7 +2,7 @@
   MIC1 Week 1. Basics
 
   Author Lucas Vonk
-         <Student number>
+         2189041
   Date   03/09/2026
 */
 
